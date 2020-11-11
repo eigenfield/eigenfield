@@ -47,10 +47,19 @@ public class DemoApplication {
         }
         jedis.connect();
         long count = jedis.incr("resumeviews");
+
         if (ipaddr != null) {
             String ldt = LocalDateTime.now().toString();
             jedis.lpush(ipaddr, ldt);
         }
+
+        IPAddressInterceptor interceptor = ctx.getBean(IPAddressInterceptor.class);
+        if (interceptor != null && interceptor.ipaddr != null && !interceptor.ipaddr.isEmpty()) {
+            jedis.lpush("remote", interceptor.ipaddr);
+        } else {
+
+        }
+
         jedis.disconnect();
         return count;
     }
